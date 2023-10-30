@@ -162,3 +162,7 @@ cython_debug/
 # Users directories
 *.csv
 
+# Logs folder
+/logs
+
+
