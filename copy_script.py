@@ -48,4 +48,4 @@ def copy_changed_files(dir_from: str, dir_to: str) -> None:
         shutil.copy2(dir_from + file.path, dir_to + file.path)
         time = dt.datetime.utcfromtimestamp(file.mod_time)
         utctime = time.astimezone(pytz.timezone(TIMEZONE)).strftime(FORMAT)
-        logger.info(SAVE_MSG.format(file.path, utctime))
+        logger.info(SAVE_MSG.format(dir_from + file.path, utctime))
