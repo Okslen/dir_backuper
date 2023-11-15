@@ -31,3 +31,7 @@ if __name__ == '__main__':
             logger.error(f'{err.strerror} {err.filename}')
             logger.debug(SLEEP_MSG.format(TIME_REPEAT))
             time.sleep(TIME_REPEAT)
+        except PermissionError as err:
+            logger.error(f'{err.strerror} {err.filename}')
+            logger.debug(SLEEP_MSG.format(TIME_REPEAT))
+            time.sleep(TIME_REPEAT)
