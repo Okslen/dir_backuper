@@ -27,11 +27,3 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             logger.debug(END_MSG.format(TIME_REPEAT))
             break
-        except FileNotFoundError as err:
-            logger.error(f'{err.strerror} {err.filename}')
-            logger.debug(SLEEP_MSG.format(TIME_REPEAT))
-            time.sleep(TIME_REPEAT)
-        except PermissionError as err:
-            logger.error(f'{err.strerror} {err.filename}')
-            logger.debug(SLEEP_MSG.format(TIME_REPEAT))
-            time.sleep(TIME_REPEAT)

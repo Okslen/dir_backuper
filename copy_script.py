@@ -40,12 +40,21 @@ def get_all_files(path: str, deep: int = 0) -> set[Files]:
     return result
 
 
+def copy_file(src: str, dst: str) -> None:
+    try:
+        shutil.copy2(src, dst)
+    except FileNotFoundError as err:
+        logger.error(f'{err.strerror} {err.filename}')
+    except PermissionError as err:
+        logger.error(f'{err.strerror} {err.filename}')
+
+
 def copy_changed_files(dir_from: str, dir_to: str) -> None:
     changed = (get_all_files(dir_from) -
                get_all_files(make_dir(dir_to)))
     for file in changed:
         make_dir(get_path(dir_to + file.path, 1))
-        shutil.copy2(dir_from + file.path, dir_to + file.path)
+        copy_file(dir_from + file.path, dir_to + file.path)
         time = dt.datetime.utcfromtimestamp(file.mod_time)
         utctime = time.astimezone(pytz.timezone(TIMEZONE)).strftime(FORMAT)
         logger.info(SAVE_MSG.format(dir_from + file.path, utctime))
