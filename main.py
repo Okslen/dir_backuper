@@ -25,5 +25,5 @@ if __name__ == '__main__':
             logger.debug(SLEEP_MSG.format(TIME_REPEAT))
             time.sleep(TIME_REPEAT)
         except KeyboardInterrupt:
-            logger.debug(END_MSG.format(TIME_REPEAT))
+            logger.debug(END_MSG)
             break
