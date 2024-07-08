@@ -18,10 +18,8 @@ def get_path(path: str, deep: int) -> str:
 
 def try_func(func, *args, **kwargs):
     try:
-        result = func(*args, **kwargs)
+        return func(*args, **kwargs)
     except FileNotFoundError as err:
         logger.error(f'{err.strerror} {err.filename}')
     except PermissionError as err:
         logger.error(f'{err.strerror} {err.filename}')
-    finally:
-        return result

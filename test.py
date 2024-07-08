@@ -11,6 +11,9 @@ for el in os.scandir('Z:\\ПЭО\\письма_справки\\к вкс 05.10.2
 
 
 time = dt.datetime.utcfromtimestamp(456879214)
+time = dt.datetime.fromtimestamp(456879214)
+# time = dt.datetime.now()
+print(time.strftime('%Y-%m-%d %H:%M:%S'))
 utctime = time.strftime('%Y-%m-%d %H:%M:%S')
 TIMEZONE = 'Etc/GMT-6'
 tz = pytz.timezone(TIMEZONE)
