@@ -9,4 +9,3 @@ SAVE_MSG = '{} изменен {}'
 SLEEP_MSG = 'sleep {} sec'
 STREAM_FORMAT = '%(asctime)s - %(message)s'
 TIME_REPEAT = 600
-TIMEZONE = 'Etc/GMT-6'

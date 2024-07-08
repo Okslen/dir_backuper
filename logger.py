@@ -18,7 +18,7 @@ def get_stream_handler():
     return stream_handler
 
 
-def get_logger(name):
+def get_logger(name: str):
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
     logger.addHandler(get_file_handler())
