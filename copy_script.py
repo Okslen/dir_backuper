@@ -32,14 +32,16 @@ def get_all_files(path: str, deep: int = 0) -> set[Files]:
     return result
 
 
-def copy_changed_files(dir_from: str, dir_to: str, modified_by='') -> None:
+def copy_changed_files(dir_from: str, dir_to: str) -> None:
     make_dir(dir_to)
     for file in (get_all_files(dir_from) - get_all_files(dir_to)):
         make_dir(get_path(dir_to + file.path, 1))
         make_copy(dir_from + file.path, dir_to + file.path)
         if file.path.endswith('docx') or file.path.endswith('xlsx'):
-            modified_by = get_last_modified_by(dir_from + file.path)
+            modified_by = ' ' + get_last_modified_by(dir_from + file.path)
+        else:
+            modified_by = ''
         time = dt.datetime.fromtimestamp(file.mod_time)
         utctime = time.strftime(FORMAT)
         logger.info(
-            SAVE_MSG.format(dir_from + file.path, ' ' + modified_by, utctime))
+            SAVE_MSG.format(dir_from + file.path, modified_by, utctime))
