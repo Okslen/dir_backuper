@@ -42,4 +42,4 @@ def copy_changed_files(dir_from: str, dir_to: str, modified_by='') -> None:
         time = dt.datetime.fromtimestamp(file.mod_time)
         utctime = time.strftime(FORMAT)
         logger.info(
-            SAVE_MSG.format(dir_from + file.path, modified_by, utctime))
+            SAVE_MSG.format(dir_from + file.path, ' ' + modified_by, utctime))
