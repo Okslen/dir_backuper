@@ -46,8 +46,12 @@ def get_scandir(path: str):
 def get_last_modified_by(path: str) -> str:
     document = zipfile.ZipFile(path)
     # Open/read the core.xml (contains the last user).
-    uglyXML = xml.dom.minidom.parseString(
-        document.read('docProps/core.xml')).toprettyxml(indent='  ')
+    try:
+        uglyXML = xml.dom.minidom.parseString(
+            document.read('docProps/core.xml')).toprettyxml(indent='  ')
+    except KeyError as err:
+        logger.error(f'{err} {path}')
+        return ''
     asText = uglyXML.splitlines()
     for item in asText:
         if 'lastModifiedBy' in item:
