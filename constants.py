@@ -5,7 +5,7 @@ LOG_FORMAT = ('%(asctime)s - [%(levelname)s] - %(name)s - '
               '(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s')
 START_MSG = 'start'
 LOG_PATH = './logs/changes.log'
-SAVE_MSG = '{} изменен {}'
+SAVE_MSG = '{} изменен {} в {}'
 SLEEP_MSG = 'sleep {} sec'
 STREAM_FORMAT = '%(asctime)s - %(message)s'
 TIME_REPEAT = 600

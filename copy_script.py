@@ -3,7 +3,8 @@ import datetime as dt
 
 from file_class import Files
 from logger import get_logger
-from utils import get_path, make_copy, make_dir, get_scandir
+from utils import (get_path, make_copy, make_dir,
+                   get_last_modified_by, get_scandir)
 
 from constants import FORMAT, SAVE_MSG
 
@@ -31,11 +32,14 @@ def get_all_files(path: str, deep: int = 0) -> set[Files]:
     return result
 
 
-def copy_changed_files(dir_from: str, dir_to: str) -> None:
+def copy_changed_files(dir_from: str, dir_to: str, modified_by='') -> None:
     make_dir(dir_to)
     for file in (get_all_files(dir_from) - get_all_files(dir_to)):
         make_dir(get_path(dir_to + file.path, 1))
         make_copy(dir_from + file.path, dir_to + file.path)
+        if file.path.endswith('docx') or file.path.endswith('xlsx'):
+            modified_by = get_last_modified_by(dir_from + file.path)
         time = dt.datetime.fromtimestamp(file.mod_time)
         utctime = time.strftime(FORMAT)
-        logger.info(SAVE_MSG.format(dir_from + file.path, utctime))
+        logger.info(
+            SAVE_MSG.format(dir_from + file.path, modified_by, utctime))

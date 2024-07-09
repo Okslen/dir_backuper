@@ -1,6 +1,9 @@
 import functools
 import os
 import shutil
+import xml.dom.minidom
+import zipfile
+
 
 from logger import get_logger
 
@@ -37,3 +40,16 @@ def get_path(path: str, deep: int) -> str:
 @try_func
 def get_scandir(path: str):
     return os.scandir(path)
+
+
+@try_func
+def get_last_modified_by(path: str) -> str:
+    document = zipfile.ZipFile(path)
+    # Open/read the core.xml (contains the last user).
+    uglyXML = xml.dom.minidom.parseString(
+        document.read('docProps/core.xml')).toprettyxml(indent='  ')
+    asText = uglyXML.splitlines()
+    for item in asText:
+        if 'lastModifiedBy' in item:
+            itemLength = len(item)-20
+            return item[21:itemLength]
