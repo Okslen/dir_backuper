@@ -38,7 +38,8 @@ def copy_changed_files(dir_from: str, dir_to: str) -> None:
         make_dir(get_path(dir_to + file.path, 1))
         make_copy(dir_from + file.path, dir_to + file.path)
         if file.path.endswith('docx') or file.path.endswith('xlsx'):
-            modified_by = ' ' + get_last_modified_by(dir_from + file.path)
+            last_modified_by = get_last_modified_by(dir_from + file.path)
+            modified_by = ' ' + last_modified_by if last_modified_by else ''
         else:
             modified_by = ''
         time = dt.datetime.fromtimestamp(file.mod_time)
