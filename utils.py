@@ -20,6 +20,8 @@ def try_func(func):
             logger.error(f'{err.strerror} {err.filename}')
         except PermissionError as err:
             logger.error(f'{err.strerror} {err.filename}')
+        except OSError as err:
+            logger.error(f'{err.strerror} {err.filename}')
     return wrapper
 
 
