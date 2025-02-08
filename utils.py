@@ -6,7 +6,7 @@ import zipfile
 
 
 from logger import get_logger
-
+from zipfile import BadZipFile
 
 logger = get_logger(__name__)
 
@@ -22,6 +22,8 @@ def try_func(func):
             logger.error(f'{err.strerror} {err.filename}')
         except OSError as err:
             logger.error(f'{err.strerror} {err.filename}')
+        except BadZipFile:
+            logger.error('')
     return wrapper
 
 
