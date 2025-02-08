@@ -9,3 +9,4 @@ SAVE_MSG = '{} изменен{} в {}'
 SLEEP_MSG = 'sleep {} sec'
 STREAM_FORMAT = '%(asctime)s - %(message)s'
 TIME_REPEAT = 600
+TIME_FOR_COPY_BACKUP = 24*60*60  # время для создания незаменяемой копии в сек

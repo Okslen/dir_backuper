@@ -34,7 +34,9 @@ def get_all_files(path: str, deep: int = 0) -> set[Files]:
 
 def copy_changed_files(dir_from: str, dir_to: str) -> None:
     make_dir(dir_to)
-    for file in (get_all_files(dir_from) - get_all_files(dir_to)):
+    all_files_dir_from = get_all_files(dir_from)
+    all_files_dir_to = get_all_files(dir_to)
+    for file in all_files_dir_from - all_files_dir_to:
         make_dir(get_path(dir_to + file.path, 1))
         make_copy(dir_from + file.path, dir_to + file.path)
         if file.path.endswith('docx') or file.path.endswith('xlsx'):
