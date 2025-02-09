@@ -2,6 +2,7 @@ import csv
 import time
 
 from pathlib import Path
+from tqdm import tqdm
 
 from copy_script import copy_changed_files
 from logger import get_logger
@@ -20,7 +21,8 @@ def start_backup(filename: str) -> None:
             header = next(reader, None)
             if header is None:
                 logger.warning(FILE_IS_EMPTY.format(filename))
-            for index, row in enumerate(reader):
+            for index, row in tqdm(
+                    enumerate(reader), desc='Rows processing', unit='row'):
                 if len(row) < 2:
                     logger.warning(INCORRECT_ROW.format(index, filename))
                 copy_changed_files(Path(row[0]), Path(row[1]))

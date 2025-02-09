@@ -1,6 +1,7 @@
 import datetime as dt
 
 from pathlib import Path
+from tqdm import tqdm
 from typing import Set
 
 from file_class import Files
@@ -8,7 +9,8 @@ from logger import get_logger
 from utils import (get_path, make_copy, make_dir,
                    get_last_modified_by, get_scandir)
 
-from constants import CHANGED_FILES_MSG, FORMAT, GET_ALL_FILES_MSG, SAVE_MSG, START_MSG
+from constants import (CHANGED_FILES_MSG, FORMAT,
+                       GET_ALL_FILES_MSG, SAVE_MSG, START_MSG)
 
 
 logger = get_logger(__name__)
@@ -46,7 +48,7 @@ def copy_changed_files(dir_from: Path, dir_to: Path) -> None:
     logger.info(GET_ALL_FILES_MSG.format(dir_to, len(dst_files)))
     changed_files = src_files - dst_files
     logger.info(CHANGED_FILES_MSG.format(len(changed_files), dir_from, dir_to))
-    for file in get_all_files(dir_from) - get_all_files(dir_to):
+    for file in tqdm(changed_files, desc='Files processing', unit='file'):
         make_dir(Path(dir_to, file.path).parent)
         make_copy(Path(dir_from, file.path), Path(dir_to, file.path))
         if file.path.name.endswith(('docx', 'xlsx')):
