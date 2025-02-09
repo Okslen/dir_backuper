@@ -1,6 +1,5 @@
 BAD_ZIP_FILE = 'Некорректный zip файл'
 CHANGED_FILES_MSG = 'Найдено изменений {}, копирую файлы из {} в {}.'
-DIR_NOT_EXIST = 'Папка {} не найдена'
 END_MSG = 'stopped by keyboard'
 FILENAME = 'папки для бекапа.csv'
 FILE_IS_EMPTY = 'Файл {} пустой!'

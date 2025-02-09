@@ -19,13 +19,15 @@ async def start_backup(filename: str) -> None:
         path = Path(filename)
         with open(path) as csvfile:
             reader = csv.reader(csvfile, delimiter=';')
+            row_count = sum(1 for _ in open(path)) - 1  # Считаем строки
+            csvfile.seek(0)  # Возвращаем указатель в начало файла
             header = next(reader, None)
             if header is None:
                 logger.warning(FILE_IS_EMPTY.format(filename))
-            reader = list(reader)
             for index, row in tqdm(
-                    enumerate(reader), total=len(reader),
-                    desc='Rows processing', unit='row'):
+                    enumerate(reader), total=row_count,
+                    desc='Rows processing', unit='row',
+                    colour="blue", ncols=80):
                 if len(row) < 2:
                     logger.warning(INCORRECT_ROW.format(index, filename))
                     continue

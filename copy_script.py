@@ -6,7 +6,7 @@ from typing import Set
 
 from file_class import Files
 from logger import get_logger
-from utils import (get_path, make_copy_async, make_dir, get_scandir)
+from utils import (make_copy_async, make_dir, get_scandir)
 
 from constants import (CHANGED_FILES_MSG, GET_ALL_FILES_MSG, START_MSG)
 
@@ -14,24 +14,23 @@ from constants import (CHANGED_FILES_MSG, GET_ALL_FILES_MSG, START_MSG)
 logger = get_logger(__name__)
 
 
-def get_all_files(path: Path, deep: int = 0) -> Set[Files]:
+def get_all_files(path: Path, base_path: Path = None) -> Set[Files]:
     result = set()
     scandir_result = get_scandir(path)
-    if scandir_result is None:
-        return result
-    base_path = get_path(path, deep)
+    if base_path is None:
+        base_path = path
     for element in scandir_result:
         if element.name.startswith('~'):
             continue
+        element_path = Path(element.path)
         if element.is_file():
             file = Files(
-                element.name,
-                Path(element.path).relative_to(base_path),
+                element_path.relative_to(base_path),
                 element.stat().st_mtime,
             )
             result.add(file)
         else:
-            input_files = get_all_files(element.path, deep + 1)
+            input_files = get_all_files(element_path, base_path)
             result = result.union(input_files)
     return result
 

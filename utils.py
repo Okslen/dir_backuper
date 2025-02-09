@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 
-from constants import BAD_ZIP_FILE, DIR_NOT_EXIST, FORMAT, SAVE_MSG
+from constants import BAD_ZIP_FILE, FORMAT, SAVE_MSG
 from file_class import Files
 from logger import get_logger
 from zipfile import BadZipFile
@@ -40,13 +40,12 @@ def get_last_modified_by(path: Path) -> str:
 def make_copy(file: Files, src: Path, dst: Path):
     try:
         shutil.copy2(src, dst)
-        if file.path.name.endswith(('docx', 'xlsx')):
+        if file.path.suffix in {'.docx', '.xlsx'}:
             last_modified_by = get_last_modified_by(src)
             modified_by = ' ' + last_modified_by if last_modified_by else ''
         else:
             modified_by = ''
-        time = dt.datetime.fromtimestamp(file.mod_time)
-        utctime = time.strftime(FORMAT)
+        utctime = dt.datetime.fromtimestamp(file.mod_time).strftime(FORMAT)
         logger.info(
             SAVE_MSG.format(src, modified_by, utctime))
     except (FileNotFoundError, PermissionError, OSError) as err:
@@ -72,16 +71,9 @@ def make_dir(dir_path: Path):
     return None
 
 
-def get_path(path: str, deep: int) -> Path:
-    result = Path(path).parents[deep - 1] if deep > 0 else Path(path)
-    return result
-
-
 def get_scandir(path: str):
     try:
-        if not os.path.exists(path):
-            logger.error(DIR_NOT_EXIST.format(path))
         return os.scandir(path)
     except (PermissionError, OSError) as err:
         logger.error(f'{err.strerror} {err.filename}')
-    return None
+    return set()
