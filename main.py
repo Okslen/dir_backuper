@@ -23,7 +23,7 @@ def start_backup(filename: str) -> None:
             for index, row in enumerate(reader):
                 if len(row) < 2:
                     logger.warning(INCORRECT_ROW.format(index, filename))
-                copy_changed_files(row[0], row[1])
+                copy_changed_files(Path(row[0]), Path(row[1]))
     except FileNotFoundError as err:
         logger.error(f'{err.strerror} {err.filename}')
 
@@ -31,7 +31,7 @@ def start_backup(filename: str) -> None:
 if __name__ == '__main__':
     while True:
         try:
-            logger.debug(START_MSG)
+            logger.debug(START_MSG.format(FILENAME))
             start_backup(FILENAME)
             logger.debug(SLEEP_MSG.format(TIME_REPEAT))
             time.sleep(TIME_REPEAT)
