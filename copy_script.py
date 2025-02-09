@@ -1,5 +1,6 @@
 import asyncio
 
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from tqdm import tqdm
 from typing import Set
@@ -12,11 +13,14 @@ from constants import (CHANGED_FILES_MSG, GET_ALL_FILES_MSG, START_MSG)
 
 
 logger = get_logger(__name__)
+executor = ThreadPoolExecutor(max_workers=5)
 
 
-def get_all_files(path: Path, base_path: Path = None) -> Set[Files]:
+async def scan_directory(path: Path, base_path: Path = None) -> Set[Files]:
     result = set()
-    scandir_result = get_scandir(path)
+    loop = asyncio.get_running_loop()
+    scandir_result = await loop.run_in_executor(executor, get_scandir, path)
+    tasks = []
     if base_path is None:
         base_path = path
     for element in scandir_result:
@@ -24,24 +28,34 @@ def get_all_files(path: Path, base_path: Path = None) -> Set[Files]:
             continue
         element_path = Path(element.path)
         if element.is_file():
-            file = Files(
+            result.add(Files(
                 element_path.relative_to(base_path),
                 element.stat().st_mtime,
-            )
-            result.add(file)
+            ))
         else:
-            input_files = get_all_files(element_path, base_path)
-            result = result.union(input_files)
+            tasks.append(asyncio.create_task(
+                scan_directory(element_path, base_path)))
+
+    if tasks:
+        scanned_result = await asyncio.gather(*tasks)
+        for scanned_files in scanned_result:
+            result = result.union(scanned_files)
     return result
+
+
+async def get_all_files_async(path: Path) -> Set[Files]:
+    """Асинхронное получение всех файлов"""
+    return await scan_directory(path)
 
 
 async def copy_changed_files_async(dir_from: Path, dir_to: Path):
     make_dir(dir_to)
     logger.info(START_MSG.format(dir_from))
-    src_files = get_all_files(dir_from)
-    logger.info(GET_ALL_FILES_MSG.format(dir_from, len(src_files)))
     logger.info(START_MSG.format(dir_to))
-    dst_files = get_all_files(dir_to)
+    src_files_task = asyncio.create_task(get_all_files_async(dir_from))
+    dst_files_task = asyncio.create_task(get_all_files_async(dir_to))
+    src_files, dst_files = await asyncio.gather(src_files_task, dst_files_task)
+    logger.info(GET_ALL_FILES_MSG.format(dir_from, len(src_files)))
     logger.info(GET_ALL_FILES_MSG.format(dir_to, len(dst_files)))
     changed_files = src_files - dst_files
     logger.info(CHANGED_FILES_MSG.format(len(changed_files), dir_from, dir_to))
