@@ -1,3 +1,4 @@
+BAD_ZIP_FILE = 'Некорректный zip файл'
 DIR_NOT_EXIST = 'Папка {} не найдена'
 END_MSG = 'stopped by keyboard'
 FILENAME = 'папки для бекапа.csv'

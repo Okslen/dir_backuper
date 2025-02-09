@@ -1,5 +1,7 @@
 import datetime as dt
 
+from pathlib import Path
+from typing import Set
 
 from file_class import Files
 from logger import get_logger
@@ -12,39 +14,41 @@ from constants import FORMAT, SAVE_MSG
 logger = get_logger(__name__)
 
 
-def get_all_files(path: str, deep: int = 0) -> set[Files]:
+def get_all_files(path: str, deep: int = 0) -> Set[Files]:
     result = set()
     scandir_result = get_scandir(path)
-    if scandir_result:
-        for element in scandir_result:
-            if element.name.startswith('~'):
-                continue
-            if element.is_file():
-                file = Files(
-                    element.name,
-                    element.path.replace(get_path(path, deep), ''),
-                    element.stat().st_mtime,
-                )
-                result.add(file)
-            else:
-                input_files = get_all_files(element.path, deep + 1)
-                result = result.union(input_files)
+    if not scandir_result:
+        return result
+    base_path = get_path(path, deep)
+    for element in scandir_result:
+        if element.name.startswith('~'):
+            continue
+        if element.is_file():
+            file = Files(
+                element.name,
+                Path(element.path).relative_to(base_path),
+                element.stat().st_mtime,
+            )
+            result.add(file)
+        else:
+            input_files = get_all_files(element.path, deep + 1)
+            result = result.union(input_files)
     return result
 
 
 def copy_changed_files(dir_from: str, dir_to: str) -> None:
     make_dir(dir_to)
-    all_files_dir_from = get_all_files(dir_from)
-    all_files_dir_to = get_all_files(dir_to)
-    for file in all_files_dir_from - all_files_dir_to:
-        make_dir(get_path(dir_to + file.path, 1))
-        make_copy(dir_from + file.path, dir_to + file.path)
-        if file.path.endswith('docx') or file.path.endswith('xlsx'):
-            last_modified_by = get_last_modified_by(dir_from + file.path)
+    for file in get_all_files(dir_from) - get_all_files(dir_to):
+        make_dir(Path(dir_to, file.path).parent)
+        make_copy(Path(dir_from, file.path), Path(dir_to, file.path))
+        if file.path.name.endswith(('docx', 'xlsx')):
+            last_modified_by = get_last_modified_by(Path(dir_from, file.path))
             modified_by = ' ' + last_modified_by if last_modified_by else ''
         else:
             modified_by = ''
         time = dt.datetime.fromtimestamp(file.mod_time)
         utctime = time.strftime(FORMAT)
         logger.info(
-            SAVE_MSG.format(dir_from + file.path, modified_by, utctime))
+            SAVE_MSG.format(
+                str(Path(dir_from, file.path)),
+                modified_by, utctime))
