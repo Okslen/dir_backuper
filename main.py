@@ -21,10 +21,13 @@ def start_backup(filename: str) -> None:
             header = next(reader, None)
             if header is None:
                 logger.warning(FILE_IS_EMPTY.format(filename))
+            reader = list(reader)
             for index, row in tqdm(
-                    enumerate(reader), desc='Rows processing', unit='row'):
+                    enumerate(reader), total=len(reader),
+                    desc='Rows processing', unit='row'):
                 if len(row) < 2:
                     logger.warning(INCORRECT_ROW.format(index, filename))
+                    continue
                 copy_changed_files(Path(row[0]), Path(row[1]))
     except FileNotFoundError as err:
         logger.error(f'{err.strerror} {err.filename}')
@@ -33,10 +36,10 @@ def start_backup(filename: str) -> None:
 if __name__ == '__main__':
     while True:
         try:
-            logger.debug(START_MSG.format(FILENAME))
+            logger.info(START_MSG.format(FILENAME))
             start_backup(FILENAME)
-            logger.debug(SLEEP_MSG.format(TIME_REPEAT))
+            logger.info(SLEEP_MSG.format(TIME_REPEAT))
             time.sleep(TIME_REPEAT)
         except KeyboardInterrupt:
-            logger.debug(END_MSG)
+            logger.info(END_MSG)
             break

@@ -14,7 +14,7 @@ from zipfile import BadZipFile
 logger = get_logger(__name__)
 
 
-def make_copy(src: str, dst: str):
+def make_copy(src: Path, dst: Path):
     try:
         shutil.copy2(src, dst)
     except (FileNotFoundError, PermissionError, OSError) as err:
@@ -24,7 +24,8 @@ def make_copy(src: str, dst: str):
 
 def make_dir(dir_path: Path):
     try:
-        os.makedirs(dir_path, exist_ok=True)
+        if not dir_path.exists():
+            dir_path.mkdir(parents=True, exist_ok=True)
     except (PermissionError, OSError) as err:
         logger.error(f'{err.strerror} {err.filename}')
     return None
