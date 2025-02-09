@@ -1,1 +1,9 @@
-
+aioshutil==1.5
+colorama==0.4.6
+mypy==1.15.0
+mypy-extensions==1.0.0
+tqdm==4.67.1
+types-requests==2.32.0.20241016
+types-tqdm==4.67.0.20241221
+typing_extensions==4.12.2
+urllib3==2.3.0
