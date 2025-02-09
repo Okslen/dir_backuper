@@ -5,6 +5,7 @@ import xml.dom.minidom
 import zipfile
 
 
+from constants import DIR_NOT_EXIST
 from logger import get_logger
 from zipfile import BadZipFile
 
@@ -24,6 +25,7 @@ def try_func(func):
             logger.error(f'{err.strerror} {err.filename}')
         except BadZipFile:
             logger.error('')
+        return None
     return wrapper
 
 
@@ -43,16 +45,17 @@ def get_path(path: str, deep: int) -> str:
 
 @try_func
 def get_scandir(path: str):
+    if not os.path.exists(path):
+        logger.error(DIR_NOT_EXIST.format(path))
     return os.scandir(path)
 
 
 @try_func
 def get_last_modified_by(path: str) -> str:
-    document = zipfile.ZipFile(path)
-    # Open/read the core.xml (contains the last user).
     try:
-        uglyXML = xml.dom.minidom.parseString(
-            document.read('docProps/core.xml')).toprettyxml(indent='  ')
+        with zipfile.ZipFile(path) as document:
+            uglyXML = xml.dom.minidom.parseString(
+                document.read('docProps/core.xml')).toprettyxml(indent='  ')
     except KeyError as err:
         logger.error(f'{err} {path}')
         return ''

@@ -1,3 +1,4 @@
+DIR_NOT_EXIST = 'Папка {} не найдена'
 END_MSG = 'stopped by keyboard'
 FILENAME = 'папки для бекапа.csv'
 FORMAT = '%Y-%m-%d %H:%M:%S'
