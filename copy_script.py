@@ -48,7 +48,9 @@ def copy_changed_files(dir_from: Path, dir_to: Path) -> None:
     logger.info(GET_ALL_FILES_MSG.format(dir_to, len(dst_files)))
     changed_files = src_files - dst_files
     logger.info(CHANGED_FILES_MSG.format(len(changed_files), dir_from, dir_to))
-    for file in tqdm(changed_files, desc='Files processing', unit='file'):
+    for file in tqdm(
+            changed_files, desc='Files processing',
+            unit='file', colour="green", ncols=80):
         make_dir(Path(dir_to, file.path).parent)
         make_copy(Path(dir_from, file.path), Path(dir_to, file.path))
         if file.path.name.endswith(('docx', 'xlsx')):
