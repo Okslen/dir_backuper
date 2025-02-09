@@ -1,20 +1,31 @@
 import csv
 import time
 
+from pathlib import Path
+
 from copy_script import copy_changed_files
 from logger import get_logger
 
-from constants import END_MSG, FILENAME, SLEEP_MSG, START_MSG, TIME_REPEAT
+from constants import (END_MSG, FILENAME, FILE_IS_EMPTY,
+                       INCORRECT_ROW, SLEEP_MSG, START_MSG, TIME_REPEAT)
 
 logger = get_logger(__name__)
 
 
 def start_backup(filename: str) -> None:
-    with open(filename) as csvfile:
-        reader = csv.reader(csvfile, delimiter=';')
-        _ = next(reader)
-        for row in reader:
-            copy_changed_files(row[0], row[1])
+    try:
+        path = Path(filename)
+        with open(path) as csvfile:
+            reader = csv.reader(csvfile, delimiter=';')
+            header = next(reader, None)
+            if header is None:
+                logger.warning(FILE_IS_EMPTY.format(filename))
+            for index, row in enumerate(reader):
+                if len(row) < 2:
+                    logger.warning(INCORRECT_ROW.format(index, filename))
+                copy_changed_files(row[0], row[1])
+    except FileNotFoundError as err:
+        logger.error(f'{err.strerror} {err.filename}')
 
 
 if __name__ == '__main__':
