@@ -16,7 +16,8 @@ logger = get_logger(__name__)
 executor = ThreadPoolExecutor(max_workers=5)
 
 
-async def scan_directory(path: Path, base_path: Path = None) -> Set[Files]:
+async def get_all_files_async(
+        path: Path, base_path: Path = None) -> Set[Files]:
     result = set()
     loop = asyncio.get_running_loop()
     scandir_result = await loop.run_in_executor(executor, get_scandir, path)
@@ -34,18 +35,13 @@ async def scan_directory(path: Path, base_path: Path = None) -> Set[Files]:
             ))
         else:
             tasks.append(asyncio.create_task(
-                scan_directory(element_path, base_path)))
+                get_all_files_async(element_path, base_path)))
 
     if tasks:
         scanned_result = await asyncio.gather(*tasks)
         for scanned_files in scanned_result:
             result = result.union(scanned_files)
     return result
-
-
-async def get_all_files_async(path: Path) -> Set[Files]:
-    """Асинхронное получение всех файлов"""
-    return await scan_directory(path)
 
 
 async def copy_changed_files_async(dir_from: Path, dir_to: Path):
