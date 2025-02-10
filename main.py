@@ -7,9 +7,9 @@ from tqdm import tqdm
 
 from copy_script import copy_changed_files_async
 from logger import get_logger
-
 from constants import (END_MSG, FILENAME, FILE_IS_EMPTY,
                        INCORRECT_ROW, SLEEP_MSG, START_MSG, TIME_REPEAT)
+from utils import shutdown_executor
 
 logger = get_logger(__name__)
 
@@ -46,3 +46,5 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             logger.info(END_MSG)
             break
+        finally:
+            shutdown_executor()

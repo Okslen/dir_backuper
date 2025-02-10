@@ -19,6 +19,10 @@ logger = get_logger(__name__)
 executor = ThreadPoolExecutor(max_workers=5)
 
 
+def shutdown_executor():
+    executor.shutdown(wait=True)
+
+
 def get_last_modified_by(path: Path) -> str:
     try:
         with zipfile.ZipFile(path) as document:
@@ -76,4 +80,4 @@ def get_scandir(path: str):
         return os.scandir(path)
     except (PermissionError, OSError) as err:
         logger.error(f'{err.strerror} {err.filename}')
-    return set()
+    return []

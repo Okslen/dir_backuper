@@ -1,19 +1,17 @@
 import asyncio
 
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from tqdm import tqdm
 from typing import Set
 
 from file_class import Files
 from logger import get_logger
-from utils import (make_copy_async, make_dir, get_scandir)
+from utils import (executor, make_copy_async, make_dir, get_scandir)
 
 from constants import (CHANGED_FILES_MSG, GET_ALL_FILES_MSG, START_MSG)
 
 
 logger = get_logger(__name__)
-executor = ThreadPoolExecutor(max_workers=5)
 
 
 async def get_all_files_async(
@@ -38,9 +36,8 @@ async def get_all_files_async(
                 get_all_files_async(element_path, base_path)))
 
     if tasks:
-        scanned_result = await asyncio.gather(*tasks)
-        for scanned_files in scanned_result:
-            result = result.union(scanned_files)
+        for scanned_files in await asyncio.gather(*tasks):
+            result.update(scanned_files)
     return result
 
 
@@ -54,7 +51,9 @@ async def copy_changed_files_async(dir_from: Path, dir_to: Path):
     logger.info(GET_ALL_FILES_MSG.format(dir_from, len(src_files)))
     logger.info(GET_ALL_FILES_MSG.format(dir_to, len(dst_files)))
     changed_files = src_files - dst_files
-    logger.info(CHANGED_FILES_MSG.format(len(changed_files), dir_from, dir_to))
+    if len(changed_files):
+        logger.info(
+            CHANGED_FILES_MSG.format(len(changed_files), dir_from, dir_to))
     tasks = []
     for file in tqdm(
             changed_files, desc='Files processing',
