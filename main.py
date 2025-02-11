@@ -45,6 +45,5 @@ if __name__ == '__main__':
             time.sleep(TIME_REPEAT)
         except KeyboardInterrupt:
             logger.info(END_MSG)
-            break
-        finally:
             shutdown_executor()
+            break

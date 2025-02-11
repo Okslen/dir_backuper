@@ -2,7 +2,6 @@ import asyncio
 
 from pathlib import Path
 from tqdm import tqdm
-from typing import Set
 
 from file_class import Files
 from logger import get_logger
@@ -15,7 +14,7 @@ logger = get_logger(__name__)
 
 
 async def get_all_files_async(
-        path: Path, base_path: Path = None) -> Set[Files]:
+        path: Path, base_path: Path = None) -> set[Files]:
     result = set()
     loop = asyncio.get_running_loop()
     scandir_result = await loop.run_in_executor(executor, get_scandir, path)
@@ -23,7 +22,7 @@ async def get_all_files_async(
     if base_path is None:
         base_path = path
     for element in scandir_result:
-        if element.name.startswith('~'):
+        if element.name.startswith('~') or element.name in {'Thumbs.db'}:
             continue
         element_path = Path(element.path)
         if element.is_file():
@@ -52,7 +51,7 @@ async def copy_changed_files_async(dir_from: Path, dir_to: Path):
     logger.debug(GET_ALL_FILES_MSG.format(dir_to, len(dst_files)))
     changed_files = src_files - dst_files
     tasks = []
-    if len(changed_files):
+    if changed_files:
         logger.info(
             CHANGED_FILES_MSG.format(len(changed_files), dir_from, dir_to))
         for file in tqdm(
