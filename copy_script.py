@@ -43,23 +43,24 @@ async def get_all_files_async(
 
 async def copy_changed_files_async(dir_from: Path, dir_to: Path):
     make_dir(dir_to)
-    logger.info(START_MSG.format(dir_from))
-    logger.info(START_MSG.format(dir_to))
+    logger.debug(START_MSG.format(dir_from))
+    logger.debug(START_MSG.format(dir_to))
     src_files_task = asyncio.create_task(get_all_files_async(dir_from))
     dst_files_task = asyncio.create_task(get_all_files_async(dir_to))
     src_files, dst_files = await asyncio.gather(src_files_task, dst_files_task)
-    logger.info(GET_ALL_FILES_MSG.format(dir_from, len(src_files)))
-    logger.info(GET_ALL_FILES_MSG.format(dir_to, len(dst_files)))
+    logger.debug(GET_ALL_FILES_MSG.format(dir_from, len(src_files)))
+    logger.debug(GET_ALL_FILES_MSG.format(dir_to, len(dst_files)))
     changed_files = src_files - dst_files
+    tasks = []
     if len(changed_files):
         logger.info(
             CHANGED_FILES_MSG.format(len(changed_files), dir_from, dir_to))
-    tasks = []
-    for file in tqdm(
-            changed_files, desc='Files processing',
-            unit='file', colour="green", ncols=80):
-        src_path, dst_path = Path(dir_from, file.path), Path(dir_to, file.path)
-        make_dir(dst_path.parent)
-        tasks.append(make_copy_async(file, src_path, dst_path))
+        for file in tqdm(
+                changed_files, desc='Files processing',
+                unit='file', colour="green", ncols=80):
+            src_path, dst_path = Path(
+                dir_from, file.path), Path(dir_to, file.path)
+            make_dir(dst_path.parent)
+            tasks.append(make_copy_async(file, src_path, dst_path))
 
     await asyncio.gather(*tasks)
