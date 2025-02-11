@@ -16,11 +16,6 @@ from logger import get_logger
 from zipfile import BadZipFile
 
 logger = get_logger(__name__)
-executor = ThreadPoolExecutor(max_workers=5)
-
-
-def shutdown_executor():
-    executor.shutdown(wait=True)
 
 
 def get_last_modified_by(path: Path) -> str:
@@ -57,7 +52,8 @@ def make_copy(file: Files, src: Path, dst: Path):
     return None
 
 
-async def make_copy_async(file: Files, src: Path, dst: Path):
+async def make_copy_async(
+        file: Files, src: Path, dst: Path, executor: ThreadPoolExecutor):
     try:
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(executor, make_copy, file, src, dst)
