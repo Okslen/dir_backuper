@@ -1,7 +1,21 @@
 import logging
+from tqdm import tqdm
 
 
 from constants import LOG_FORMAT, LOG_PATH, STREAM_FORMAT
+
+
+class TqdmLoggingHandler(logging.Handler):
+    def __init__(self, level=logging.NOTSET):
+        super().__init__(level)
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            tqdm.write(msg)
+            self.flush()
+        except Exception:
+            self.handleError(record)
 
 
 def get_file_handler():
@@ -12,7 +26,7 @@ def get_file_handler():
 
 
 def get_stream_handler():
-    stream_handler = logging.StreamHandler()
+    stream_handler = TqdmLoggingHandler()
     stream_handler.setLevel(logging.DEBUG)
     stream_handler.setFormatter(logging.Formatter(STREAM_FORMAT))
     return stream_handler
