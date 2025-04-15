@@ -2,7 +2,6 @@ import asyncio
 
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from tqdm import tqdm
 
 from file_class import Files
 from logger import get_logger
@@ -59,9 +58,7 @@ async def copy_changed_files_async(
     if changed_files:
         logger.info(
             CHANGED_FILES_MSG.format(len(changed_files), dir_from, dir_to))
-        for file in tqdm(
-                changed_files, desc='Files processing',
-                unit='file', colour="green", ncols=80):
+        for file in changed_files:
             src_path, dst_path = Path(
                 dir_from, file.path), Path(dir_to, file.path)
             make_dir(dst_path.parent)
