@@ -28,6 +28,7 @@ def get_last_modified_by(path: Path) -> str:
         return ''
     except BadZipFile:
         logger.error(BAD_ZIP_FILE)
+        return ''
     asText = uglyXML.splitlines()
     for item in asText:
         if 'lastModifiedBy' in item:
